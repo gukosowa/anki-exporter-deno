@@ -10,7 +10,18 @@ function getUrl(page = 1, sentence: Language = 'jpn'): string {
 
 async function fetchBody(url: string): Promise<ResultApi> {
   const response = await fetch(url);
-  return JSON.parse(await response.text()) as ResultApi;
+  const text = await response.text();
+  let json;
+  for (let retry = 0; retry < 20; retry++) {
+    try {
+      json = JSON.parse(text);
+    } catch (e) {
+      console.log('Error: ' + text);
+      await sleep(1000);
+    }
+  }
+
+  return json as ResultApi;
 }
 
 async function downloadAudio(result: Result): Promise<void> {
@@ -50,14 +61,12 @@ export async function fetchPages(
   sentence: Language = 'jpn',
   throttle = 1000,
 ): Promise<Result[]> {
-  const promises: Promise<Result[]>[] = [];
+  const results: Result[][] = [];
   for (let page = from; page <= to; page++) {
     console.log(`Crawl page ${page}`);
-    promises.push(fetchPage(page, sentence));
+    results.push(await fetchPage(page, sentence));
     await sleep(throttle);
   }
-
-  const results = await Promise.all(promises) as Result[][];
 
   return results.flat();
 }
