@@ -21,7 +21,7 @@ const configAnki = {
   },
 };
 
-async function createDeck(
+export async function createDeck(
   from: number,
   to: number,
   sentence: Language = 'jpn',
@@ -52,5 +52,3 @@ async function createDeck(
   Deno.removeSync(pathDeck, { recursive: true });
   Deno.removeSync(pathMedia, { recursive: true });
 }
-
-await createDeck(1, 3, 'jpn', 200);

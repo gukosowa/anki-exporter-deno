@@ -1,3 +1,3 @@
 #!/bin/bash
 
-deno run --allow-net --allow-write --allow-read --allow-run --allow-env --unstable src/main.ts
+deno run --allow-net --allow-write --allow-read --allow-run --allow-env --unstable crawl.ts
