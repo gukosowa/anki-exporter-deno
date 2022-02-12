@@ -1,8 +1,5 @@
-// Reference:
-// https://github.com/ankidroid/Anki-Android/wiki/Database-Structure
-import sha1 from 'https://esm.sh/sha1';
 import { Card, DeckConfig } from './typings.d.ts';
-import { DB } from 'https://deno.land/x/sqlite@v3.2.1/src/db.ts';
+import { DB, sha1 } from '../deps.ts';
 
 export function initDatabase(database: DB, config: DeckConfig) {
   const current = config.id;

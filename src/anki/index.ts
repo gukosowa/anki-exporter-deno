@@ -1,25 +1,26 @@
-import { DB } from 'https://deno.land/x/sqlite@v3.2.1/mod.ts';
 import { initDatabase, insertCard } from './sql.ts';
-import { zipDir } from 'https://deno.land/x/jszip@0.11.0/mod.ts';
 import { Card, DeckConfig } from './typings.d.ts';
-import { ensureDirSync } from 'https://deno.land/std@0.125.0/fs/ensure_dir.ts';
+import { DB, ensureDirSync, zipDir } from '../deps.ts';
+import { pathBuild, pathDeck } from '../misc.ts';
 
 export class AnkiBuilder {
   private readonly db: DB;
   private readonly deck: DeckConfig;
-  private readonly dest: string;
   private mediaFiles: string[];
 
   constructor(private config: DeckConfig) {
-    this.dest = './deck/';
     this.clean();
-    this.db = new DB(this.dest + 'collection.anki2');
+    this.db = new DB(this.destination() + 'collection.anki2');
     this.deck = {
       ...config,
       id: +new Date(),
     };
     initDatabase(this.db, this.deck);
     this.mediaFiles = [];
+  }
+
+  destination(): string {
+    return pathDeck;
   }
 
   addCard(card: Card) {
@@ -29,11 +30,11 @@ export class AnkiBuilder {
   addMedia(filename: string, data: Uint8Array) {
     const index = this.mediaFiles.length;
     this.mediaFiles.push(filename);
-    Deno.writeFileSync(this.dest + `${index}`, data);
+    Deno.writeFileSync(this.destination() + `${index}`, data);
   }
 
   async save() {
-    ensureDirSync('./build');
+    ensureDirSync(pathBuild);
 
     const mediaObj = this.mediaFiles.reduce(
       (obj: Record<number, string>, file: string, index: number) => {
@@ -42,19 +43,22 @@ export class AnkiBuilder {
       },
       {},
     );
-    Deno.writeTextFileSync(`${this.dest}media`, JSON.stringify(mediaObj));
+    Deno.writeTextFileSync(
+      `${this.destination()}media`,
+      JSON.stringify(mediaObj),
+    );
 
-    const zipPath = `./build/${this.config.name}.apkg`;
-    const zip = await zipDir('./deck/');
+    const zipPath = `${pathBuild}${this.config.name}.apkg`;
+    const zip = await zipDir(this.destination());
     await zip.writeZip(zipPath);
   }
 
   private clean() {
     try {
-      Deno.removeSync(this.dest, { recursive: true });
+      Deno.removeSync(this.destination(), { recursive: true });
     } catch (_e) {
       // skip
     }
-    ensureDirSync(this.dest);
+    ensureDirSync(this.destination());
   }
 }

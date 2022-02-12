@@ -45,7 +45,7 @@ apkg.addMedia(filename: string, data: Buffer)
 const { readFileSync } = require('fs');
 const { join } = require('path');
 
-const { APKG } = require('../');
+const { APKG } = require('../.');
 
 const apkg = new APKG({
   name: 'UnicornBuilder',
