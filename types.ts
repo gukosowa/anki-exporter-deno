@@ -2,7 +2,7 @@ export interface CompleteSort {
   'Sentences.created': string;
 }
 
-export type Language = 'deu' | 'eng' | 'jpn'
+export type Language = 'deu' | 'eng' | 'jpn';
 
 export interface Sentences {
   finder: string;

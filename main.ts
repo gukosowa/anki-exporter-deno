@@ -1,5 +1,5 @@
 import { ensureDir } from 'https://deno.land/std@0.125.0/fs/mod.ts';
-import { Result, ResultApi, Language } from './types.ts';
+import { Language, Result, ResultApi } from './types.ts';
 import { AnkiBuilder } from './anki/index.ts';
 
 function getUrl(page = 1, sentence: Language = 'jpn'): string {
@@ -33,7 +33,10 @@ function getAudioUrl(result: Result): string {
   return `https://audio.tatoeba.org/sentences/jpn/${result.id}.mp3`;
 }
 
-async function fetchPage(page: number, sentence: Language = 'jpn'): Promise<Result[]> {
+async function fetchPage(
+  page: number,
+  sentence: Language = 'jpn',
+): Promise<Result[]> {
   const json = await fetchBody(getUrl(page, sentence));
 
   const promises = [];
