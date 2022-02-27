@@ -31,8 +31,8 @@ export async function createDeck(
   const apkg = new AnkiBuilder(configAnki);
   const results = await fetchPages(from, to, sentence, throttle);
 
+  console.log(`Build ${results.length} Anki cards...`);
   for (const result of results) {
-    console.log('Build Anki card...');
     const sentence = result.text;
     const translation = getTranslation(result.translations[0], preferLang);
     const transcription = result.transcriptions[0]?.html ?? '';
