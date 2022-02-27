@@ -33,7 +33,7 @@ export class AnkiBuilder {
     Deno.writeFileSync(this.destination() + `${index}`, data);
   }
 
-  async save() {
+  async save(): Promise<string> {
     ensureDirSync(pathBuild);
 
     const mediaObj = this.mediaFiles.reduce(
@@ -51,6 +51,8 @@ export class AnkiBuilder {
     const zipPath = `${pathBuild}${this.config.name}.apkg`;
     const zip = await zipDir(this.destination());
     await zip.writeZip(zipPath);
+
+    return zipPath;
   }
 
   private clean() {

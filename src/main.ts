@@ -1,6 +1,6 @@
 import { Language } from './types.ts';
 import { AnkiBuilder } from './anki/index.ts';
-import { fetchPages } from './tatoeba.ts';
+import { fetchPages, getTranslation } from './tatoeba.ts';
 import { pathDeck, pathMedia } from './misc.ts';
 
 const configAnki = {
@@ -26,13 +26,15 @@ export async function createDeck(
   to: number,
   sentence: Language = 'jpn',
   throttle = 1000,
+  preferLang: Language[] = ['deu', 'eng'],
 ) {
   const apkg = new AnkiBuilder(configAnki);
   const results = await fetchPages(from, to, sentence, throttle);
 
   for (const result of results) {
+    console.log('Build Anki card...');
     const sentence = result.text;
-    const translation = result.translations[0][0].text;
+    const translation = getTranslation(result.translations[0], preferLang);
     const transcription = result.transcriptions[0]?.html ?? '';
     const audioFile = `${result.id}.mp3`;
     const audioPath = `${pathMedia}${audioFile}`;
@@ -47,8 +49,11 @@ export async function createDeck(
     });
   }
 
-  await apkg.save();
+  console.log('Zip and save created files...');
+  const filename = await apkg.save();
 
   Deno.removeSync(pathDeck, { recursive: true });
   Deno.removeSync(pathMedia, { recursive: true });
+
+  console.log(`Cleared temp files and created out/${filename}`);
 }
